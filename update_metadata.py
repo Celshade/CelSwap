@@ -21,7 +21,9 @@ from solana.rpc.async_api import AsyncClient
 
 class MetadataService():
     def __init__(self, token_address: str) -> None:
-        self.address = token_address
+        self.token = token_address
+        self.on_chain = {}  # on_chain metadata
+        self.off_chain = {}  # off_chain metadata
 
     def __get_on_chain_data(address: str) -> dict[str, Optional[Any]]:
         """
