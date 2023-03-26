@@ -3,3 +3,5 @@
 *.egg
 venv/*
 
+# other
+*.json
