@@ -1,5 +1,5 @@
 """
-Update the off_chain metadata for a given NFT.
+Update the metadata for a given NFT.
 This is intended for use by the authority of the NFT being modified.
 
 Assumptions:
@@ -12,7 +12,6 @@ Python Requirements:
 System Requirements:
     solana CLI
     metaboss
-    bundlr
 """
 import os
 import shutil
@@ -60,13 +59,15 @@ class MetadataService():
             raise e
 
     # TODO implement (break this out somewhere else?)
+    # TODO run this even after an Exception is raised
     def __cleanup(self):
         """
         Remove any temporary files that were generated.
         """
         try:
-            # Jump back to where the user was before running the program
-            os.chdir("..")
+            # Exit the working dir before cleanup
+            if self.working_dir in os.path.abspath('.'):
+                os.chdir("..")
             # Delete the working dir
             shutil.rmtree(self.working_dir)
         except Exception as e:
