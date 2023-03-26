@@ -14,13 +14,10 @@ System Requirements:
     metaboss
 """
 import os
-import shutil
 import json
 from typing import Union, Optional, Any
 
 import requests
-# from solana.rpc.async_api import AsyncClient
-
 
 # NOTE: Test token: CHYNQyNUxXkD97xgtHuJJFsHmjGVi8aakqFoXjGxySEB
 
@@ -38,41 +35,6 @@ class MetadataService():
         self.uri = None  # on_chain uri pointing to off_chain metadata
         self.metadata = {}  # off_chain metadata (traits)
         self.working_dir = None  # The current working dir
-
-    # TODO implement (break this out somewhere else?)
-    def __prep_env(self) -> None:
-        """
-        Prepare a working environment so user dirs are not polluted.
-        """
-        if not self.working_dir:
-            self.working_dir = "_CELSWAP_temp"
-
-        try:
-            # Check for existing temp dir, else create
-            if not os.path.exists(self.working_dir):
-                os.mkdir(self.working_dir)
-
-            # Move into the temp dir
-            os.chdir(self.working_dir)
-        except Exception as e:
-            print("Error during setup")
-            raise e
-
-    # TODO implement (break this out somewhere else?)
-    # TODO run this even after an Exception is raised
-    def __cleanup(self):
-        """
-        Remove any temporary files that were generated.
-        """
-        try:
-            # Exit the working dir before cleanup
-            if self.working_dir in os.path.abspath('.'):
-                os.chdir("..")
-            # Delete the working dir
-            shutil.rmtree(self.working_dir)
-        except Exception as e:
-            print("Error during clean up")
-            raise e
 
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -158,23 +120,3 @@ class MetadataService():
     # TODO
     # Call METABOSS to update the data field of the on=chain data
     #   Points to the updated off-chain metadata
-
-
-# NOTE: simple progress bar
-# import sys
-# import time
-
-# def progressbar(it, prefix="", size=60, out=sys.stdout): # Python3.6+
-#     count = len(it)
-#     def show(j):
-#         x = int(size*j/count)
-#         print(f"{prefix}[{u'█'*x}{('.'*(size-x))}] {j}/{count}", end='\r', file=out, flush=True)
-#     show(0)
-#     for i, item in enumerate(it):
-#         yield item
-#         show(i+1)
-#     print("\n", flush=True, file=out)
-
-
-# for i in progressbar(range(15), "Computing: ", 40):
-#     time.sleep(0.1) # any code you need
