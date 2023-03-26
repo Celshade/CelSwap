@@ -10,7 +10,7 @@ class TempCel():
     >>> `with TempCel():`
     """
     def __init__(self) -> None:
-        self.WORKING_DIR = "_CELSWAP_TEMP/"
+        self.WORKING_DIR = "_CELSWAP_TEMP"
 
     def __enter__(self) -> None:
         """
@@ -23,11 +23,12 @@ class TempCel():
 
             # Move into the temp dir
             os.chdir(self.WORKING_DIR)
+            # print("IN THE WORKING ENV")
         except Exception as e:
             print("Error during setup")
             raise e
 
-    def __exit__(self):
+    def __exit__(self, *args, **kwargs) -> None:
         """
         Leave the temp working environment and cleanup.
         """

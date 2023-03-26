@@ -27,10 +27,7 @@ import requests
 
 
 class MetadataService():
-    def __init__(
-        self,
-        token_address: str,
-    ) -> None:
+    def __init__(self, token_address: str) -> None:
         self.token = token_address
         self.uri = None  # on_chain uri pointing to off_chain metadata
         self.metadata = {}  # off_chain metadata (traits)

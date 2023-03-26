@@ -20,7 +20,7 @@ from utils import TempCel
 def main():
     with TempCel():  # Manage a working dir to avoid user file pollution
         try:
-            # TODO add progress bar?
+            # TODO add progress bar? On iteration?
             # TODO add shell colors?
             pass
         except Exception as e:
