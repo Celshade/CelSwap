@@ -1,18 +1,3 @@
-"""
-Update the metadata for a given NFT.
-This is intended for use by the authority of the NFT being modified.
-
-Assumptions:
-    Solana config::keypair is set to the update authority of the target NFT
-
-Author: Celshade
-
-Python Requirements:
-    requests
-System Requirements:
-    solana CLI
-    metaboss
-"""
 import os
 import json
 from typing import Union, Optional, Any
@@ -29,9 +14,8 @@ import requests
 class MetadataService():
     def __init__(self, token_address: str) -> None:
         self.token = token_address
-        self.uri = None  # on_chain uri pointing to off_chain metadata
-        self.metadata = {}  # off_chain metadata (traits)
-        self.working_dir = None  # The current working dir
+        self.uri: Optional[str] = None  # on_chain uri pointing to off_chain metadata
+        self.metadata: dict[str, str] = {}  # off_chain metadata (traits)
 
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -52,6 +36,9 @@ class MetadataService():
                 metadata = json.loads(f.read())
                 uri = metadata["data"]["uri"].strip("\x00")  # strip strays
             return uri
+        except AssertionError as e:
+            print("Could not find metadata file")
+            raise e
         except Exception as e:
             print("Error parsing on_chain data")
             raise e
@@ -69,17 +56,19 @@ class MetadataService():
             assert res.status_code == 200
             # Parse the metadata and return
             return json.loads(res.text)
-        # except AssertionError as e:
-        #     print("Something went wrong requesting metadata")
-        #     raise e
+        except AssertionError as e:
+            print("Error requesting metadata")
+            raise e
         except Exception as e:
             print("Error getting off_chain data")
             raise e
 
     def _upload_off_chain_data(self):
+        # TODO: bundlr
         raise NotImplementedError
 
     def _update_metadata_uri(self):
+        # TODO metaboss
         raise NotImplementedError
 
     # TODO
@@ -89,7 +78,7 @@ class MetadataService():
 
     def get_existing_data(self) -> None:
         """
-        Set attributes for the existing metadata.
+        Establish the existing metadata.
         """
         try:
             self.uri = self._get_metadata_uri(self.token)
@@ -100,15 +89,15 @@ class MetadataService():
 
     def create_updated_data(
         self,
-        on_chain_data: dict[str, Optional[Any]],
         off_chain_data: dict[str, Optional[Any]],
-        new_data: dict[str, Optional[Any]]
+        new_data: str  # NOTE: JSON
     ) -> dict[str, Union[str, int]]:
         """
         Return the updated on-chain and off-chain metadata.
 
+        The format of the new data must be in json format.
+
         Args:
-            on_chain_data: The existing on-chain metadata.
             off_chain_data: The existing off-chain metadata.
             new_data: The off-chain metadata we want to make use of.
         """

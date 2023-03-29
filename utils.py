@@ -2,6 +2,7 @@ import os
 import shutil
 
 
+# FIXME: Fix this context manager and ensure cleanup
 class TempCel():
     """
     Manage a temporary working environment so user dirs are not polluted.

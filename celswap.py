@@ -12,7 +12,10 @@ Python Requirements:
 System Requirements:
     solana CLI
     metaboss
+    bundlr
 """
+# TODO: Add system requirement installation instructions to README
+
 from metadata import MetadataService
 from utils import TempCel
 
