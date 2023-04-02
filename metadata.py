@@ -1,18 +1,3 @@
-"""
-Update the metadata for a given NFT.
-This is intended for use by the authority of the NFT being modified.
-
-Assumptions:
-    Solana config::keypair is set to the update authority of the target NFT
-
-Author: Celshade
-
-Python Requirements:
-    requests
-System Requirements:
-    solana CLI
-    metaboss
-"""
 import os
 import json
 from typing import Union, Optional, Any
