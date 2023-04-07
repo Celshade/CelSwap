@@ -22,7 +22,7 @@ from utils import TempCel
 
 
 def main():
-    token = "CHYNQyNUxXkD97xgtHuJJFsHmjGVi8aakqFoXjGxySEB"  # NOTE: Test token
+    token = "iu7DGFv6LsdGb9THFGtdF3cSmpt8CwJjY527vnLzBcw"  # NOTE: devnet CKEY
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     with TempCel():  # Manage a working dir to avoid user file pollution
