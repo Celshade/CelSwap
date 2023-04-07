@@ -6,7 +6,8 @@ class TempCel():
     """
     Manage a temporary working environment so user dirs are not polluted.
 
-    This is a context manager.
+    This is a context manager. Any temporary files should be removed upon
+    exit.
     >>> `with TempCel():`
     """
     def __init__(self) -> None:
@@ -18,12 +19,13 @@ class TempCel():
         """
         try:
             # Check for existing temp dir, else create
-            if not os.path.exists(self.WORKING_DIR):
+            if not os.path.exists(f"{self.WORKING_DIR}"):
                 os.mkdir(self.WORKING_DIR)
+                # print("WORKING ENV CREATED")  # NOTE: TESTING
 
             # Move into the temp dir
             os.chdir(self.WORKING_DIR)
-            # print("IN THE WORKING ENV")
+            # print("IN THE WORKING ENV")  # NOTE: TESTING
         except Exception as e:
             print("Error during setup")
             raise e
@@ -34,10 +36,11 @@ class TempCel():
         """
         try:
             # Exit the working dir before cleanup
-            if self.WORKING_DIR in os.path.abspath('.'):
+            if os.path.abspath('.').endswith(self.WORKING_DIR):
                 os.chdir("..")
             # Delete the working dir
             shutil.rmtree(self.WORKING_DIR)
+            # print("WORKING DIR REMOVED")  # NOTE: TESTING
         except Exception as e:
             print("Error during clean up")
             raise e
