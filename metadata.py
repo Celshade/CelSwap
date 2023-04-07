@@ -4,8 +4,6 @@ from typing import Union, Optional, Any
 
 import requests
 
-# NOTE: Test token: CHYNQyNUxXkD97xgtHuJJFsHmjGVi8aakqFoXjGxySEB
-
 # TODO
 # Accept a config of traits to update and their new values
 #   Use json format (endpoint?)
@@ -16,7 +14,6 @@ class MetadataService():
         self.token = token_address
         self.uri = None  # on_chain uri pointing to off_chain metadata
         self.metadata = {}  # off_chain metadata (traits)
-        self.working_dir = None  # The current working dir
 
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -30,15 +27,16 @@ class MetadataService():
         try:
             # Get on_chain metadata
             os.system(f"metaboss decode mint -a {token_address}")
-            # Ensure the metada file exists
             assert os.path.exists(f"{token_address}.json")
+            print("metadata decoded")  # NOTE: TESTING
+
             # Parse the uri
             with open(f"{token_address}.json", 'r') as f:
                 metadata = json.loads(f.read())
-                uri = metadata["data"]["uri"].strip("\x00")  # strip strays
+                uri = metadata["uri"]
             return uri
         except Exception as e:
-            print("Error parsing on_chain data")
+            print(f"Error parsing on_chain data: {e}")
             raise e
 
     def _get_off_chain_data(self, uri: str) -> dict[str, str]:
@@ -52,13 +50,12 @@ class MetadataService():
             # Get off_chain metadata
             res = requests.get(uri)
             assert res.status_code == 200
-            # Parse the metadata and return
             return json.loads(res.text)
         # except AssertionError as e:
         #     print("Something went wrong requesting metadata")
         #     raise e
         except Exception as e:
-            print("Error getting off_chain data")
+            print(f"Error getting off_chain data: {e}")
             raise e
 
     def _upload_off_chain_data(self):
@@ -80,7 +77,7 @@ class MetadataService():
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
         except Exception as e:
-            print("Error loading existing data")
+            print(f"Error loading existing data: {e}")
             raise e
 
     def create_updated_data(
