@@ -33,8 +33,7 @@ def main():
             # print(os.path.abspath('.'))  # NOTE: TESTING
             # pass
             service = MetadataService(token_address=token)
-            service.get_existing_data()
-            pprint(service.metadata)  # NOTE: TESTING
+            service.get_existing_data(show=True)
         except Exception as e:
             pass
     # print("left context_manager")  # NOTE: TESTING

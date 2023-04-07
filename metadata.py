@@ -1,5 +1,6 @@
 import os
 import json
+from pprint import pprint
 from typing import Union, Optional, Any
 
 import requests
@@ -69,13 +70,19 @@ class MetadataService():
     #   Write new off-chain metadata
     #   Upload new off-chain metadata
 
-    def get_existing_data(self) -> None:
+    def get_existing_data(self, show: bool = False) -> None:
         """
         Set attributes for the existing metadata.
+
+        Args:
+            show: Optional flag to print the metadata on calling the method.
         """
         try:
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
+
+            if show:
+                pprint(self.metadata)
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e
