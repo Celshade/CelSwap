@@ -14,15 +14,23 @@ System Requirements:
     metaboss
     bundlr
 """
-import os
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import TempCel
+from utils import parse_cli_args, TempCel
 
 
 def main():
-    token = "iu7DGFv6LsdGb9THFGtdF3cSmpt8CwJjY527vnLzBcw"  # NOTE: devnet CKEY
+    # Parse CLI for NFT data
+    data = parse_cli_args()
+    if not data:
+        print("No data provided. Run with --help for more info.")
+        return
+    # Get the token addr
+    token: str = data.pop("token")
+    # token = "iu7DGFv6LsdGb9THFGtdF3cSmpt8CwJjY527vnLzBcw"  # NOTE: devnet CKEY
+    print(f"Token: {token}")  # NOTE: TESTING
+    print(f"Attributes: {data}")  # NOTE: TESTING
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     with TempCel():  # Manage a working dir to avoid user file pollution
@@ -32,7 +40,7 @@ def main():
             # print("within context manager...")  # NOTE: TESTING
             # print(os.path.abspath('.'))  # NOTE: TESTING
             # pass
-            service = MetadataService(token_address=token)
+            service = MetadataService(token_address=token, updated_attributes=data)
             service.get_existing_data(show=True)
         except Exception as e:
             pass

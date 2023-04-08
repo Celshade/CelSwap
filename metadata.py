@@ -1,7 +1,7 @@
 import os
 import json
 from pprint import pprint
-from typing import Union, Optional, Any
+from typing import Any
 
 import requests
 
@@ -12,18 +12,22 @@ import requests
 
 class MetadataService():
     """
-    Replace existing off-chain metadata with new values.
+    Update existing attribute data on an NFT.
 
     Args:
         token_address: The NFT token address.
-        updated_attributes: JSON string of replacement attributes.
+        updated_attributes: Updated attribute data (default=None).
     """
-    def __init__(self, token_address: str, updated_attributes: str) -> None:
+    def __init__(
+            self,
+            token_address: str,
+            updated_attributes: dict[str, str | int | float] | None = None
+    ) -> None:
         self.token = token_address
         self.uri = None  # on_chain uri pointing to off_chain metadata
         self.metadata = {}  # off_chain metadata
-        self.updated_attributes = updated_attributes  # replacement data (traits)
-
+        self.updated_attributes = updated_attributes  # replacement data
+  
     def _get_metadata_uri(self, token_address: str) -> str:
         """
         Parse the on_chain metadata and return the uri for the off_chain
@@ -98,10 +102,10 @@ class MetadataService():
 
     def create_updated_data(
         self,
-        on_chain_data: dict[str, Optional[Any]],
-        off_chain_data: dict[str, Optional[Any]],
-        new_data: dict[str, Optional[Any]]
-    ) -> dict[str, Union[str, int]]:
+        on_chain_data: dict[str, Any | None],
+        off_chain_data: dict[str, Any | None],
+        new_data: dict[str, Any | None]
+    ) -> dict[str, str | int]:
         """
         Return the updated on-chain and off-chain metadata.
 
