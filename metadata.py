@@ -24,9 +24,10 @@ class MetadataService():
             updated_attributes: dict[str, str | int | float] | None = None
     ) -> None:
         self.token = token_address
-        self.uri = None  # on_chain uri pointing to off_chain metadata
-        self.metadata = {}  # off_chain metadata
         self.updated_attributes = updated_attributes  # replacement data
+        self.existing_attributes: dict | None = None
+        self.metadata: dict[str, Any] | None = None  # off_chain metadata
+        self.uri: str | None = None  # on_chain uri pointing to off_chain metadata
   
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -52,7 +53,7 @@ class MetadataService():
             print(f"Error parsing on_chain data: {e}")
             raise e
 
-    def _get_off_chain_data(self, uri: str) -> dict[str, str]:
+    def _get_off_chain_data(self, uri: str) -> dict[str, Any]:
         """
         Return the off-chain metadata for the given uri.
 

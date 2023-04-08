@@ -50,27 +50,32 @@ class TempCel():
 
 def parse_cli_args() -> dict[str, str | int | float] | None:
     """
-    Parse JSON CLI data and return it as a dict.
+    Parse JSON CLI config and return it as a dict.
     """
     try:
         # init parser
         parser =  argparse.ArgumentParser()
         # Configure args: add as needed
-        parser.add_argument(
+        parser.add_argument(  # token data (JSON)
             "-d", "--data", type=str,
             help="Token address and desired attribute data in JSON format"
+        )
+        parser.add_argument(  # bool flag to control program prompts
+            "-f", "--force", action="store_true", default=False,
+            help="Forces the program to run without confirmation prompts"
         )
         # Parse data
         args = parser.parse_args()
         if not args.data:
             return None
-        data = json.loads(args.data)
+        config = json.loads(args.data)
+        config["force"] = args.force  # set `force` flag in the config dict
 
-        # Validate data
-        assert isinstance(data, dict)
-        assert "token" in data  # token_address
+        # Validate config data
+        assert isinstance(config, dict)
+        assert "token" in config  # token_address
 
-        return data
+        return config
     except AssertionError as ae:
         print(f"Invalid json config: {ae}")
         raise ae
