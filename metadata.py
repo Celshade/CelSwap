@@ -15,19 +15,21 @@ class MetadataService():
     Update existing attribute data on an NFT.
 
     Args:
+        force: Flag to bypass confirmation prompts.
         token_address: The NFT token address.
         updated_attributes: Updated attribute data (default=None).
     """
     def __init__(
             self,
-            token_address: str,
-            updated_attributes: dict[str, str | int | float] | None = None
+            force: bool,
+            token_address: str
     ) -> None:
+        self.force = force
         self.token = token_address
-        self.updated_attributes = updated_attributes  # replacement data
-        self.existing_attributes: dict | None = None
+        self.uri: str | None = None  # on_chain uri -> off_chain metadata
         self.metadata: dict[str, Any] | None = None  # off_chain metadata
-        self.uri: str | None = None  # on_chain uri pointing to off_chain metadata
+        self.existing_attributes: list[dict[str, str | int | float]] | None = None
+        self.updated_metadata: dict[str, Any] | None = None
   
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -72,8 +74,22 @@ class MetadataService():
             print(f"Error getting off_chain data: {e}")
             raise e
 
-    def _upload_off_chain_data(self):
-        raise NotImplementedError
+    def _create_new_off_chain_data(self,
+            new_data: dict[str, str | int | float],
+            show: bool = False
+    ) -> None:
+        # TODO FIXME: finish implementing
+        # Preserve existing attributes in case not all are updated
+        self.updated_metadata = self.metadata.copy()
+        # Update attributes
+        for attr in new_data:
+            if attr in self.existing_attributes:
+                self.updated_metadata["attributes"][attr] = new_data[attr]
+
+        # Handle verbose
+        if show:
+            pprint(self.updated_metadata)
+            print(self.updated_metadata == self.metadata)
 
     def _update_metadata_uri(self):
         raise NotImplementedError
@@ -93,28 +109,17 @@ class MetadataService():
         try:
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
+            self.existing_attributes = self.metadata.get("attributes")
 
-            # Handle testing output
+            # Handle verbose
             if show:
-                pprint(self.metadata)
+                # pprint(self.metadata)
+                print(f"Existing attributes: {self.existing_attributes}")
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e
 
-    def create_updated_data(
-        self,
-        on_chain_data: dict[str, Any | None],
-        off_chain_data: dict[str, Any | None],
-        new_data: dict[str, Any | None]
-    ) -> dict[str, str | int]:
-        """
-        Return the updated on-chain and off-chain metadata.
-
-        Args:
-            on_chain_data: The existing on-chain metadata.
-            off_chain_data: The existing off-chain metadata.
-            new_data: The off-chain metadata we want to make use of.
-        """
+    def create_updated_data(self) -> dict[str, str | int | float]:
         raise NotImplementedError
 
     # TODO

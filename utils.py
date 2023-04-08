@@ -61,15 +61,15 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
             help="Token address and desired attribute data in JSON format"
         )
         parser.add_argument(  # bool flag to control program prompts
-            "-f", "--force", action="store_true", default=False,
-            help="Forces the program to run without confirmation prompts"
+            "-s", "--safe", action="store_true", default=True,
+            help="Forces the program to run with confirmation prompts"
         )
         # Parse data
         args = parser.parse_args()
         if not args.data:
             return None
         config = json.loads(args.data)
-        config["force"] = args.force  # set `force` flag in the config dict
+        config["force"] = args.safe  # set `force` flag in the config dict
 
         # Validate config data
         assert isinstance(config, dict)
