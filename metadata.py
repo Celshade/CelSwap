@@ -11,10 +11,18 @@ import requests
 
 
 class MetadataService():
-    def __init__(self, token_address: str) -> None:
+    """
+    Replace existing off-chain metadata with new values.
+
+    Args:
+        token_address: The NFT token address.
+        updated_attributes: JSON string of replacement attributes.
+    """
+    def __init__(self, token_address: str, updated_attributes: str) -> None:
         self.token = token_address
         self.uri = None  # on_chain uri pointing to off_chain metadata
-        self.metadata = {}  # off_chain metadata (traits)
+        self.metadata = {}  # off_chain metadata
+        self.updated_attributes = updated_attributes  # replacement data (traits)
 
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -81,6 +89,7 @@ class MetadataService():
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
 
+            # Handle testing output
             if show:
                 pprint(self.metadata)
         except Exception as e:
