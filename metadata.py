@@ -1,10 +1,9 @@
 import os
 import json
+from pprint import pprint
 from typing import Union, Optional, Any
 
 import requests
-
-# NOTE: Test token: CHYNQyNUxXkD97xgtHuJJFsHmjGVi8aakqFoXjGxySEB
 
 # TODO
 # Accept a config of traits to update and their new values
@@ -12,10 +11,18 @@ import requests
 
 
 class MetadataService():
-    def __init__(self, token_address: str) -> None:
+    """
+    Replace existing off-chain metadata with new values.
+
+    Args:
+        token_address: The NFT token address.
+        updated_attributes: JSON string of replacement attributes.
+    """
+    def __init__(self, token_address: str, updated_attributes: str) -> None:
         self.token = token_address
-        self.uri: Optional[str] = None  # on_chain uri pointing to off_chain metadata
-        self.metadata: dict[str, str] = {}  # off_chain metadata (traits)
+        self.uri = None  # on_chain uri pointing to off_chain metadata
+        self.metadata = {}  # off_chain metadata
+        self.updated_attributes = updated_attributes  # replacement data (traits)
 
     def _get_metadata_uri(self, token_address: str) -> str:
         """
@@ -29,18 +36,19 @@ class MetadataService():
         try:
             # Get on_chain metadata
             os.system(f"metaboss decode mint -a {token_address}")
-            # Ensure the metada file exists
             assert os.path.exists(f"{token_address}.json")
+            print("metadata decoded")  # NOTE: TESTING
+
             # Parse the uri
             with open(f"{token_address}.json", 'r') as f:
                 metadata = json.loads(f.read())
-                uri = metadata["data"]["uri"].strip("\x00")  # strip strays
+                uri = metadata["uri"]
             return uri
         except AssertionError as e:
             print("Could not find metadata file")
             raise e
         except Exception as e:
-            print("Error parsing on_chain data")
+            print(f"Error parsing on_chain data: {e}")
             raise e
 
     def _get_off_chain_data(self, uri: str) -> dict[str, str]:
@@ -54,13 +62,12 @@ class MetadataService():
             # Get off_chain metadata
             res = requests.get(uri)
             assert res.status_code == 200
-            # Parse the metadata and return
             return json.loads(res.text)
         except AssertionError as e:
             print("Error requesting metadata")
             raise e
         except Exception as e:
-            print("Error getting off_chain data")
+            print(f"Error getting off_chain data: {e}")
             raise e
 
     def _upload_off_chain_data(self):
@@ -76,15 +83,22 @@ class MetadataService():
     #   Write new off-chain metadata
     #   Upload new off-chain metadata
 
-    def get_existing_data(self) -> None:
+    def get_existing_data(self, show: bool = False) -> None:
         """
-        Establish the existing metadata.
+        Set attributes for the existing metadata.
+
+        Args:
+            show: Optional flag to print the metadata on calling the method.
         """
         try:
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
+
+            # Handle testing output
+            if show:
+                pprint(self.metadata)
         except Exception as e:
-            print("Error loading existing data")
+            print(f"Error loading existing data: {e}")
             raise e
 
     def create_updated_data(
