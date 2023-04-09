@@ -17,7 +17,6 @@ class MetadataService():
     Args:
         force: Flag to bypass confirmation prompts.
         token_address: The NFT token address.
-        updated_attributes: Updated attribute data (default=None).
     """
     def __init__(
             self,
@@ -29,7 +28,7 @@ class MetadataService():
         self.uri: str | None = None  # on_chain uri -> off_chain metadata
         self.metadata: dict[str, Any] | None = None  # off_chain metadata
         self.existing_attributes: list[dict[str, str | int | float]] | None = None
-        self.updated_metadata: dict[str, Any] | None = None
+        self.updated_attributes: list[dict[str, str | int | float]] | None = None
   
     def _get_metadata_uri(self, token_address: str) -> str:
         """
