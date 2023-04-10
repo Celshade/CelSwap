@@ -1,7 +1,7 @@
 import os
 import json
 from pprint import pprint
-from typing import Union, Optional, Any
+from typing import Any
 
 import requests
 
@@ -12,18 +12,24 @@ import requests
 
 class MetadataService():
     """
-    Replace existing off-chain metadata with new values.
+    Update existing attribute data on an NFT.
 
     Args:
+        force: Flag to bypass confirmation prompts.
         token_address: The NFT token address.
-        updated_attributes: JSON string of replacement attributes.
     """
-    def __init__(self, token_address: str, updated_attributes: str) -> None:
+    def __init__(
+            self,
+            force: bool,
+            token_address: str
+    ) -> None:
+        self.force = force
         self.token = token_address
-        self.uri = None  # on_chain uri pointing to off_chain metadata
-        self.metadata = {}  # off_chain metadata
-        self.updated_attributes = updated_attributes  # replacement data (traits)
-
+        self.uri: str | None = None  # on_chain uri -> off_chain metadata
+        self.metadata: dict[str, Any] | None = None  # off_chain metadata
+        self.existing_attributes: list[dict[str, str | int | float]] | None = None
+        self.updated_attributes: list[dict[str, str | int | float]] | None = None
+  
     def _get_metadata_uri(self, token_address: str) -> str:
         """
         Parse the on_chain metadata and return the uri for the off_chain
@@ -51,7 +57,7 @@ class MetadataService():
             print(f"Error parsing on_chain data: {e}")
             raise e
 
-    def _get_off_chain_data(self, uri: str) -> dict[str, str]:
+    def _get_off_chain_data(self, uri: str) -> dict[str, Any]:
         """
         Return the off-chain metadata for the given uri.
 
@@ -70,9 +76,22 @@ class MetadataService():
             print(f"Error getting off_chain data: {e}")
             raise e
 
-    def _upload_off_chain_data(self):
-        # TODO: bundlr
-        raise NotImplementedError
+    def _create_new_off_chain_data(self,
+            new_data: dict[str, str | int | float],
+            show: bool = False
+    ) -> None:
+        # TODO FIXME: finish implementing
+        # Preserve existing attributes in case not all are updated
+        self.updated_metadata = self.metadata.copy()
+        # Update attributes
+        for attr in new_data:
+            if attr in self.existing_attributes:
+                self.updated_metadata["attributes"][attr] = new_data[attr]
+
+        # Handle verbose
+        if show:
+            pprint(self.updated_metadata)
+            print(self.updated_metadata == self.metadata)
 
     def _update_metadata_uri(self):
         # TODO metaboss
@@ -93,28 +112,17 @@ class MetadataService():
         try:
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
+            self.existing_attributes = self.metadata.get("attributes")
 
-            # Handle testing output
+            # Handle verbose
             if show:
-                pprint(self.metadata)
+                # pprint(self.metadata)
+                print(f"Existing attributes: {self.existing_attributes}")
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e
 
-    def create_updated_data(
-        self,
-        off_chain_data: dict[str, Optional[Any]],
-        new_data: str  # NOTE: JSON
-    ) -> dict[str, Union[str, int]]:
-        """
-        Return the updated on-chain and off-chain metadata.
-
-        The format of the new data must be in json format.
-
-        Args:
-            off_chain_data: The existing off-chain metadata.
-            new_data: The off-chain metadata we want to make use of.
-        """
+    def create_updated_data(self) -> dict[str, str | int | float]:
         raise NotImplementedError
 
     # TODO

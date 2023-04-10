@@ -5,3 +5,6 @@ venv/*
 
 # other
 *.json
+
+# tests
+tests.txt

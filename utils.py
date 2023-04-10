@@ -1,3 +1,5 @@
+import argparse
+import json
 import os
 import shutil
 
@@ -45,6 +47,42 @@ class TempCel():
         except Exception as e:
             print("Error during clean up")
             raise e
+
+
+def parse_cli_args() -> dict[str, str | int | float] | None:
+    """
+    Parse JSON CLI config and return it as a dict.
+    """
+    try:
+        # init parser
+        parser =  argparse.ArgumentParser()
+        # Configure args: add as needed
+        parser.add_argument(  # token data (JSON)
+            "-d", "--data", type=str,
+            help="Token address and desired attribute data in JSON format"
+        )
+        parser.add_argument(  # bool flag to control program prompts
+            "-s", "--safe", action="store_true", default=True,
+            help="Forces the program to run with confirmation prompts"
+        )
+        # Parse data
+        args = parser.parse_args()
+        if not args.data:
+            return None
+        config = json.loads(args.data)
+        config["force"] = args.safe  # set `force` flag in the config dict
+
+        # Validate config data
+        assert isinstance(config, dict)
+        assert "token" in config  # token_address
+
+        return config
+    except AssertionError as ae:
+        print(f"Invalid json config: {ae}")
+        raise ae
+    except Exception as e:
+        print(f"Error parsing data from the CLI: {e}")
+        raise e
 
 # NOTE: simple progress bar
 # import sys
