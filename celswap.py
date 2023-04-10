@@ -32,6 +32,7 @@ def main():
     force: bool = data.pop("force")
     print(f"Token: {token}")  # NOTE: TESTING
     print(f"Attributes: {data}")  # NOTE: TESTING
+    print(type(data))
     print(force)  # NOTE: TESTING
     print(type(force))  # NOTE: TESTING
 
@@ -45,8 +46,9 @@ def main():
                 # print(os.path.abspath('.'))  # NOTE: TESTING
                 service = MetadataService(token_address=token, force=force)
                 service.get_existing_data(show=True)
+                service._update_attrs(new_data=data, show=True)
                 # TODO update data
-                # service._create_new_off_chain_data(new_data=data, show=True)
+                service._create_new_off_chain_data()
             except Exception as e:
                 pass
         # print("left context_manager")  # NOTE: TESTING

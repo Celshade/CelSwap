@@ -5,10 +5,6 @@ from typing import Any
 
 import requests
 
-# TODO
-# Accept a config of traits to update and their new values
-#   Use json format (endpoint?)
-
 
 class MetadataService():
     """
@@ -25,11 +21,11 @@ class MetadataService():
     ) -> None:
         self.force = force
         self.token = token_address
-        self.uri: str | None = None  # on_chain uri -> off_chain metadata
-        self.metadata: dict[str, Any] | None = None  # off_chain metadata
-        self.existing_attributes: list[dict[str, str | int | float]] | None = None
-        self.updated_attributes: list[dict[str, str | int | float]] | None = None
-  
+        self.uri: str = None  # on_chain uri -> off_chain metadata
+        self.metadata: dict[str, Any] = None  # off_chain metadata
+        self.existing_attrs: list[dict[str, str | int | float]] = None
+        self.updated_attrs: list[dict[str, str | int | float]] = None
+
     def _get_metadata_uri(self, token_address: str) -> str:
         """
         Parse the on_chain metadata and return the uri for the off_chain
@@ -73,29 +69,45 @@ class MetadataService():
             print(f"Error getting off_chain data: {e}")
             raise e
 
-    def _create_new_off_chain_data(self,
-            new_data: dict[str, str | int | float],
-            show: bool = False
+    def _update_attrs(
+        self,
+        new_data: dict[str, str | int | float],
+        show: bool = False
     ) -> None:
-        # TODO FIXME: finish implementing
-        # Preserve existing attributes in case not all are updated
-        self.updated_metadata = self.metadata.copy()
-        # Update attributes
-        for attr in new_data:
-            if attr in self.existing_attributes:
-                self.updated_metadata["attributes"][attr] = new_data[attr]
+        """
+        Update attributes to their new values.
 
-        # Handle verbose
-        if show:
-            pprint(self.updated_metadata)
-            print(self.updated_metadata == self.metadata)
+        Args:
+            new_data: The desired attributes and their values.
+            show: Flag to output testing info (default=False).
+        """
+        # Preserve existing attributes in case not all are updated
+        self.updated_attrs = self.existing_attrs.copy()
+
+        # Update attributes
+        for attr in self.updated_attrs:
+            trait = attr["trait_type"]
+
+            if attr["trait_type"] in new_data:
+                new_value = new_data[trait]
+
+                # Handle verbose
+                if show:
+                    print(f"Updated {trait}: {attr['value']} -> {new_value}")
+                # Update the attribute
+                attr["value"] = new_value
+
+        # Update metadata
+        self.metadata["attributes"] = self.updated_attrs
+
+    def _update_off_chain_data(self):
+        raise NotImplementedError
 
     def _update_metadata_uri(self):
         raise NotImplementedError
 
     # TODO
     # Update existing fields to the provided values
-    #   Write new off-chain metadata
     #   Upload new off-chain metadata
 
     def get_existing_data(self, show: bool = False) -> None:
@@ -103,17 +115,18 @@ class MetadataService():
         Set attributes for the existing metadata.
 
         Args:
-            show: Optional flag to print the metadata on calling the method.
+            show: Flag to output testing info (default=False).
         """
         try:
             self.uri = self._get_metadata_uri(self.token)
             self.metadata = self._get_off_chain_data(self.uri)
-            self.existing_attributes = self.metadata.get("attributes")
+            self.existing_attrs = self.metadata.get("attributes")
 
             # Handle verbose
             if show:
                 # pprint(self.metadata)
-                print(f"Existing attributes: {self.existing_attributes}")
+                print("Existing attributes:")
+                pprint(self.existing_attrs)
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e
