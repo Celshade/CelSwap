@@ -130,10 +130,3 @@ class MetadataService():
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e
-
-    def create_updated_data(self) -> dict[str, str | int | float]:
-        raise NotImplementedError
-
-    # TODO
-    # Call METABOSS to update the data field of the on=chain data
-    #   Points to the updated off-chain metadata
