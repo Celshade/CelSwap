@@ -38,7 +38,7 @@ class MetadataService():
         try:
             # Get on_chain metadata
             os.system(f"metaboss decode mint -a {token_address}")
-            assert os.path.exists(f"{token_address}.json")
+            assert os.path.exists(f"{token_address}.json")  # sanity check
             print("metadata decoded")  # NOTE: TESTING
 
             # Parse the uri
@@ -77,6 +77,8 @@ class MetadataService():
         """
         Update attributes to their new values.
 
+        NOTE: This method WILL not upload to the new data to arweave.
+
         Args:
             new_data: The desired attributes and their values.
             show: Flag to output testing info (default=False).
@@ -100,8 +102,36 @@ class MetadataService():
         # Update metadata
         self.metadata["attributes"] = self.updated_attrs
 
-    def _update_off_chain_data(self):
-        raise NotImplementedError
+    def _update_off_chain_data(self, bundlr_dir: str) -> None:
+        """
+        Push the updated metadata to arweave.
+
+        NOTE: This requires a small amount of lamports to fund the upload.
+
+        Args:
+            bundlr_dir: The directory where the bundlr program is installed.
+        """
+        try:
+            # Get pwd
+            curdir = os.path.abspath('.')
+            # TODO navigate to bundlr dir and nav back when finished
+            os.chdir(bundlr_dir)
+            # TODO Create json file
+            jsonified = json.dumps(self.updated_attrs)
+            # TODO calculate price for upload
+            # TODO fund bundlr node
+            # TODO upload to arweave
+            # TODO check for successful upload
+            # TODO preserve uri
+            uri = None
+            # Return to previous location
+            os.chdir(bundlr_dir)
+        except FileNotFoundError as de:
+            print(f"Error switching directories: {de}")
+            raise de
+        except Exception as e:
+            print(f"Error updating off-chain metadata: {e}")
+            raise e
 
     def _update_metadata_uri(self):
         raise NotImplementedError
