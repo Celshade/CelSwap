@@ -10,7 +10,8 @@ class TempCel():
 
     This is a context manager. Any temporary files should be removed upon
     exit.
-    >>> `with TempCel():`
+
+    `i.e. with TempCel(): do stuff`
     """
     def __init__(self) -> None:
         self.WORKING_DIR = "_CELSWAP_TEMP"
@@ -84,6 +85,28 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
     except Exception as e:
         print(f"Error parsing data from the CLI: {e}")
         raise e
+
+
+def get_bundlr_dir() -> str | None:
+    """
+    Read the config file to get the directory for bundlr calls.
+
+    `See project README for config file information`
+    """
+    try:
+        with open("./config.json", 'r') as f:
+            bundlr_dir = json.load(f).get("bundlr_dir")
+            if bundlr_dir:
+                return bundlr_dir
+            else:
+                raise ValueError("No bundlr directory found in config")
+
+    except FileNotFoundError as fe:
+        print(f"Error finding config file - check naming: {fe}")
+    except Exception as e:
+        print(f"Error reading bundlr config file: {e}")
+        raise e
+
 
 # NOTE: simple progress bar
 # import sys
