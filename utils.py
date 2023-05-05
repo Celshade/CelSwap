@@ -54,7 +54,7 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
     """
     try:
         # init parser
-        parser =  argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
         # Configure args: add as needed
         parser.add_argument(  # token data (JSON)
             "-d", "--data", type=str,
@@ -64,18 +64,20 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
             "-s", "--safe", action="store_true", default=True,
             help="Forces the program to run with confirmation prompts"
         )
+
         # Parse data
         args = parser.parse_args()
-        if not args.data:
+        if not args.data:  # Exit early
             return None
+
         config = json.loads(args.data)
         config["force"] = args.safe  # set `force` flag in the config dict
 
         # Validate config data
         assert isinstance(config, dict)
         assert "token" in config  # token_address
-
         return config
+
     except AssertionError as ae:
         print(f"Invalid json config: {ae}")
         raise ae
