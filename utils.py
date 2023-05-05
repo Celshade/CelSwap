@@ -89,7 +89,9 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
 
 def get_bundlr_dir() -> str | None:
     """
-    Read the config file to get the directory for bundlr calls.
+    Return the directory for bundlr calls.
+
+    Reads from a simple `config.json` file.
 
     `See project README for config file information`
     """
