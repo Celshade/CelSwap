@@ -17,7 +17,7 @@ System Requirements:
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import parse_cli_args, TempCel
+from utils import TempCel, parse_cli_args, get_bundlr_dir
 
 
 def main():
@@ -44,11 +44,18 @@ def main():
                 # TODO add shell colors?
                 # print("within context manager...")  # NOTE: TESTING
                 # print(os.path.abspath('.'))  # NOTE: TESTING
+
+                # Init
+                bundlr_dir = get_bundlr_dir()
                 service = MetadataService(token_address=token, force=force)
+
+                # Get existing data
                 service.get_existing_data(show=True)
+                # Create updated data
                 service._update_attrs(new_data=data, show=True)
-                # TODO update data
                 service._create_new_off_chain_data()
+                # Upload new data
+
             except Exception as e:
                 pass
         # print("left context_manager")  # NOTE: TESTING
