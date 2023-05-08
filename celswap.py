@@ -17,7 +17,7 @@ System Requirements:
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import TempCel, parse_cli_args, get_bundlr_dir
+from utils import TempCel, parse_cli_args, get_bundlr_dir, get_wallet_path
 
 
 def main():
@@ -45,8 +45,9 @@ def main():
                 # print("within context manager...")  # NOTE: TESTING
                 # print(os.path.abspath('.'))  # NOTE: TESTING
 
-                # Init
+                # Init vars and service(s)
                 bundlr_dir = get_bundlr_dir()
+                wallet = get_wallet_path()
                 service = MetadataService(token_address=token, force=force)
 
                 # Get existing data
@@ -55,6 +56,7 @@ def main():
                 service._update_attrs(new_data=data, show=True)
                 service._create_new_off_chain_data()
                 # Upload new data
+                
 
             except Exception as e:
                 pass

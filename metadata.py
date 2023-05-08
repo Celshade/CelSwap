@@ -102,7 +102,11 @@ class MetadataService():
         # Update metadata
         self.metadata["attributes"] = self.updated_attrs
 
-    def _update_off_chain_data(self, bundlr_dir: str) -> None:
+    def _update_off_chain_data(
+            self,
+            bundlr_dir: str,
+            auth_keypair: str
+    ) -> None:
         """
         Push the updated metadata to arweave.
 
@@ -111,6 +115,7 @@ class MetadataService():
 
         Args:
             bundlr_dir: The directory where the bundlr program is installed.
+            auth_keypair: The path to the configured wallet authority.
         """
         try:
             # Get pwd
