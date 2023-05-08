@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 
 
 class TempCel():
@@ -107,6 +108,30 @@ def get_bundlr_dir() -> str | None:
         print(f"Error finding config file - check naming: {fe}")
     except Exception as e:
         print(f"Error reading bundlr config file: {e}")
+        raise e
+
+
+def get_wallet_path() -> str:
+    """
+    Return the path to the current active wallet.
+
+    NOTE: Requires a wallet (keypair) to be set in the `solana` CLI config.
+    Please ensure an *absolute* path is set in the config.
+    """
+    try:
+        # Get the solana config
+        solana_config: list[str] = subprocess.check_output(
+            "solana config get", shell=True  # NOTE: `shell` param is critical
+        ).decode("utf-8").split('\n')
+        # Get and return wallet_path
+        wallet_path = [
+            cfg.split(':')[1].strip()
+            for cfg in solana_config if cfg.startswith("Keypair")
+        ].pop()
+        return wallet_path
+
+    except Exception as e:
+        print(f"Error getting wallet path: {e}")
         raise e
 
 

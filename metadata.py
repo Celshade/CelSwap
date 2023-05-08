@@ -106,7 +106,8 @@ class MetadataService():
         """
         Push the updated metadata to arweave.
 
-        NOTE: This requires a small amount of lamports to fund the upload.
+        NOTE: This requires a small amount of lamports to fund the upload to
+        arweave.
 
         Args:
             bundlr_dir: The directory where the bundlr program is installed.
@@ -114,7 +115,7 @@ class MetadataService():
         try:
             # Get pwd
             curdir = os.path.abspath('.')
-            # TODO navigate to bundlr dir and nav back when finished
+            # TODO navigate to bundlr dir
             os.chdir(bundlr_dir)
             # TODO Create json file
             jsonified = json.dumps(self.updated_attrs)
@@ -125,7 +126,7 @@ class MetadataService():
             # TODO preserve uri
             uri = None
             # Return to previous location
-            os.chdir(bundlr_dir)
+            os.chdir(curdir)
         except FileNotFoundError as de:
             print(f"Error switching directories: {de}")
             raise de
