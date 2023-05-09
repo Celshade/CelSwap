@@ -88,6 +88,30 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
         raise e
 
 
+def get_wallet_path() -> str:
+    """
+    Return the path to the current active wallet.
+
+    NOTE: Requires a wallet (keypair) to be set in the `solana` CLI config.
+    Please ensure an *absolute* path is set in the config.
+    """
+    try:
+        # Get the solana config
+        solana_config: list[str] = subprocess.check_output(
+            "solana config get", shell=True  # NOTE: `shell` param is critical
+        ).decode("utf-8").split('\n')
+        # Get and return wallet_path
+        wallet_path = [
+            cfg.split(':')[1].strip()
+            for cfg in solana_config if cfg.startswith("Keypair")
+        ].pop()
+        return wallet_path
+
+    except Exception as e:
+        print(f"Error getting wallet path: {e}")
+        raise e
+
+
 def get_bundlr_dir() -> str | None:
     """
     Return the directory for bundlr calls.
@@ -111,28 +135,30 @@ def get_bundlr_dir() -> str | None:
         raise e
 
 
-def get_wallet_path() -> str:
+def get_bundlr_price(file: str, bundlr_dir: str) -> int:
     """
-    Return the path to the current active wallet.
+    Get the price [in lamports] to upload the given file to arweave.
 
-    NOTE: Requires a wallet (keypair) to be set in the `solana` CLI config.
-    Please ensure an *absolute* path is set in the config.
+    Assumes the file is in the current directory.
+
+    Args:
+        file: The file to price-check.
     """
-    try:
-        # Get the solana config
-        solana_config: list[str] = subprocess.check_output(
-            "solana config get", shell=True  # NOTE: `shell` param is critical
-        ).decode("utf-8").split('\n')
-        # Get and return wallet_path
-        wallet_path = [
-            cfg.split(':')[1].strip()
-            for cfg in solana_config if cfg.startswith("Keypair")
-        ].pop()
-        return wallet_path
+    pwd = os.path.abspath('.')
+    os.chdir(bundlr_dir)  # Move to bundlr_dir
 
-    except Exception as e:
-        print(f"Error getting wallet path: {e}")
-        raise e
+    # Get filesize
+    fsize = os.path.getsize(f"{pwd}/{file}")
+    # Get the upload price
+    price_command = f"npx bundlr price {fsize} -h https://node1.bundlr.network -c solana"
+    upload_price = int(
+        subprocess.check_output(
+            price_command, shell=True
+        ).decode("utf-8").strip('\n').split().pop(-4)
+    )
+
+    os.chdir(pwd)  # Return to working dir
+    return upload_price
 
 
 # NOTE: simple progress bar

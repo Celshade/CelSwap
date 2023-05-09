@@ -38,6 +38,13 @@ def main():
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     if token:
+        # Init vars and service(s)
+        bundlr_dir = get_bundlr_dir()
+        # print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
+        wallet = get_wallet_path()
+        # print(f"wallet: {wallet}\n")  # NOTE: TESTING
+        service = MetadataService(token_address=token, force=force)
+
         with TempCel():  # Manage a working dir to avoid user file pollution
             try:
                 # TODO add progress bar? On iteration?
@@ -45,18 +52,12 @@ def main():
                 # print("within context manager...")  # NOTE: TESTING
                 # print(os.path.abspath('.'))  # NOTE: TESTING
 
-                # Init vars and service(s)
-                bundlr_dir = get_bundlr_dir()
-                wallet = get_wallet_path()
-                service = MetadataService(token_address=token, force=force)
-
                 # Get existing data
                 service.get_existing_data(show=True)
                 # Create updated data
                 service._update_attrs(new_data=data, show=True)
-                service._create_new_off_chain_data()
+                # service._create_new_off_chain_data()
                 # Upload new data
-                
 
             except Exception as e:
                 pass

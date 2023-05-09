@@ -75,9 +75,9 @@ class MetadataService():
         show: bool = False
     ) -> None:
         """
-        Update attributes to their new values.
+        Update attributes to their new values and write the new metadata file.
 
-        NOTE: This method WILL not upload to the new data to arweave.
+        NOTE: This method will NOT upload to the new data to arweave.
 
         Args:
             new_data: The desired attributes and their values.
@@ -102,6 +102,12 @@ class MetadataService():
         # Update metadata
         self.metadata["attributes"] = self.updated_attrs
 
+        # Write the updated metadata to file
+        with open("updated_metadata.json", 'w') as f:
+            f.write(json.dumps(self.metadata))
+        # Confirm existance of metadata file
+        assert os.path.exists(f"updated_metadata.json")  # sanity check
+
     def _update_off_chain_data(
             self,
             bundlr_dir: str,
@@ -123,7 +129,7 @@ class MetadataService():
             # TODO navigate to bundlr dir
             os.chdir(bundlr_dir)
             # TODO Create json file
-            jsonified = json.dumps(self.updated_attrs)
+            jsonified = json.dumps(self.metadata)
             # TODO calculate price for upload
             # TODO fund bundlr node
             # TODO upload to arweave
