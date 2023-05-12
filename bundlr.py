@@ -38,16 +38,46 @@ def get_bundlr_price(file: str, bundlr_node: int = 1) -> int:
     # Get filesize
     fsize = os.path.getsize(file)
     # Config bundlr_network url
-    bundlr_node = f"https://node{bundlr_node}.bundlr.network"
+    node = f"https://node{bundlr_node}.bundlr.network"
     # Get the upload price
-    price_command = f"npx bundlr price {fsize} -h {bundlr_node} -c solana"
+    command = f"npx bundlr price {fsize} -h {node} -c solana"
     upload_price = int(
         subprocess.check_output(
-            price_command, shell=True
+            command, shell=True
         ).decode("utf-8").strip('\n').split().pop(-4)
     )
     return upload_price
 
 
-def upload_file_to_arweave(file: str, bundlr_dir: str, bundlr_node: int = 1) -> None:
+def fund_bundlr_node(lamports: int, wallet: str, bundlr_node: int = 1) -> None:
+    """
+    Fund the bundlr node.
+
+    NOTE: Funds will be taken from the current keypair designated in the solana
+    config.
+
+    Args:
+        lamports: The number of lamports to fund the node with.
+        wallet: The path to the funding wallet.
+        bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
+    """
+    # Config bundlr_network url
+    node = f"https://node{bundlr_node}.bundlr.network"
+    # Fund the node
+    command = f"npx bundlr fund {lamports} -h {node} -w {wallet} -c solana"
+    fund_message = int(
+        subprocess.check_output(
+            command, shell=True
+        ).decode("utf-8").strip('\n').split().pop(-4)
+    )
+
+
+def upload_file_to_arweave(file: str, bundlr_node: int = 1) -> str:
+    """
+    Upload the file to arweave and return the destination url.
+
+    Args:
+        file: The file to upload.
+        bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
+    """
     raise NotImplementedError
