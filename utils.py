@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 
 
 # FIXME: Fix this context manager and ensure cleanup
@@ -11,7 +12,8 @@ class TempCel():
 
     This is a context manager. Any temporary files should be removed upon
     exit.
-    >>> `with TempCel():`
+
+    `i.e. with TempCel(): do stuff`
     """
     def __init__(self) -> None:
         self.WORKING_DIR = "_CELSWAP_TEMP"
@@ -55,7 +57,7 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
     """
     try:
         # init parser
-        parser =  argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
         # Configure args: add as needed
         parser.add_argument(  # token data (JSON)
             "-d", "--data", type=str,
@@ -65,24 +67,100 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
             "-s", "--safe", action="store_true", default=True,
             help="Forces the program to run with confirmation prompts"
         )
+
         # Parse data
         args = parser.parse_args()
-        if not args.data:
+        if not args.data:  # Exit early
             return None
+
         config = json.loads(args.data)
         config["force"] = args.safe  # set `force` flag in the config dict
 
         # Validate config data
         assert isinstance(config, dict)
         assert "token" in config  # token_address
-
         return config
+
     except AssertionError as ae:
         print(f"Invalid json config: {ae}")
         raise ae
     except Exception as e:
         print(f"Error parsing data from the CLI: {e}")
         raise e
+
+
+def get_wallet_path() -> str:
+    """
+    Return the path to the current active wallet.
+
+    NOTE: Requires a wallet (keypair) to be set in the `solana` CLI config.
+    Please ensure an *absolute* path is set in the config.
+    """
+    try:
+        # Get the solana config
+        solana_config: list[str] = subprocess.check_output(
+            "solana config get", shell=True  # NOTE: `shell` param is critical
+        ).decode("utf-8").split('\n')
+        # Get and return wallet_path
+        wallet_path = [
+            cfg.split(':')[1].strip()
+            for cfg in solana_config if cfg.startswith("Keypair")
+        ].pop()
+        return wallet_path
+
+    except Exception as e:
+        print(f"Error getting wallet path: {e}")
+        raise e
+
+
+def get_bundlr_dir() -> str | None:
+    """
+    Return the directory for bundlr calls.
+
+    Reads from a simple `config.json` file.
+
+    `See project README for config file information`
+    """
+    try:
+        with open("./config.json", 'r') as f:
+            bundlr_dir = json.load(f).get("bundlr_dir")
+            if bundlr_dir:
+                return bundlr_dir
+            else:
+                raise ValueError("No bundlr directory found in config")
+
+    except FileNotFoundError as fe:
+        print(f"Error finding config file - check naming: {fe}")
+    except Exception as e:
+        print(f"Error reading bundlr config file: {e}")
+        raise e
+
+
+def get_bundlr_price(file: str, bundlr_dir: str) -> int:
+    """
+    Get the price [in lamports] to upload the given file to arweave.
+
+    Assumes the file is in the current directory.
+
+    Args:
+        file: The file to price-check.
+    """
+    pwd = os.path.abspath('.')
+    os.chdir(bundlr_dir)  # Move to bundlr_dir
+
+    # Get filesize
+    fsize = os.path.getsize(f"{pwd}/{file}")
+    # Get the upload price
+    price_command = f"npx bundlr price {fsize} -h https://node1.bundlr.network -c solana"
+    upload_price = int(
+        subprocess.check_output(
+            price_command, shell=True
+        ).decode("utf-8").strip('\n').split().pop(-4)
+    )
+
+    os.chdir(pwd)  # Return to working dir
+    return upload_price
+
 
 # NOTE: simple progress bar
 # import sys
