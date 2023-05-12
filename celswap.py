@@ -17,7 +17,7 @@ System Requirements:
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import TempCel, parse_cli_args, get_bundlr_dir, get_wallet_path
+from utils import TempCel, parse_cli_args, get_wallet_path
 
 
 def main():
@@ -32,18 +32,20 @@ def main():
     force: bool = data.pop("force")
     print(f"Token: {token}")  # NOTE: TESTING
     print(f"Attributes: {data}")  # NOTE: TESTING
-    print(type(data))
-    print(force)  # NOTE: TESTING
-    print(type(force))  # NOTE: TESTING
+    # print(type(data))  # NOTE: TESTING
+    print(f"Force flag: {force}")  # NOTE: TESTING
+    # print(type(force))  # NOTE: TESTING
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     if token:
         # Init vars and service(s)
-        bundlr_dir = get_bundlr_dir()
-        # print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
         wallet = get_wallet_path()
-        # print(f"wallet: {wallet}\n")  # NOTE: TESTING
-        service = MetadataService(token_address=token, force=force)
+        print(f"wallet: {wallet}\n")  # NOTE: TESTING
+        service = MetadataService(
+            token_address=token,
+            auth_keypair=wallet,
+            force=force
+        )
 
         with TempCel():  # Manage a working dir to avoid user file pollution
             try:
@@ -56,6 +58,7 @@ def main():
                 service.get_existing_data(show=True)
                 # Create updated data
                 service._update_attrs(new_data=data, show=True)
+                service._upload_off_chain_data()
                 # service._create_new_off_chain_data()
                 # Upload new data
 

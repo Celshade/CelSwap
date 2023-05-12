@@ -1,7 +1,7 @@
-import argparse
-import json
 import os
+import json
 import shutil
+import argparse
 import subprocess
 
 
@@ -10,8 +10,9 @@ class TempCel():
     """
     Manage a temporary working environment so user dirs are not polluted.
 
-    This is a context manager. Any temporary files should be removed upon
-    exit.
+    This context manager will manage a temporary working environment and
+    ensure that any generated files will be cleaned up (removed) once the
+    program terminates.
 
     `i.e. with TempCel(): do stuff`
     """
@@ -111,55 +112,6 @@ def get_wallet_path() -> str:
     except Exception as e:
         print(f"Error getting wallet path: {e}")
         raise e
-
-
-def get_bundlr_dir() -> str | None:
-    """
-    Return the directory for bundlr calls.
-
-    Reads from a simple `config.json` file.
-
-    `See project README for config file information`
-    """
-    try:
-        with open("./config.json", 'r') as f:
-            bundlr_dir = json.load(f).get("bundlr_dir")
-            if bundlr_dir:
-                return bundlr_dir
-            else:
-                raise ValueError("No bundlr directory found in config")
-
-    except FileNotFoundError as fe:
-        print(f"Error finding config file - check naming: {fe}")
-    except Exception as e:
-        print(f"Error reading bundlr config file: {e}")
-        raise e
-
-
-def get_bundlr_price(file: str, bundlr_dir: str) -> int:
-    """
-    Get the price [in lamports] to upload the given file to arweave.
-
-    Assumes the file is in the current directory.
-
-    Args:
-        file: The file to price-check.
-    """
-    pwd = os.path.abspath('.')
-    os.chdir(bundlr_dir)  # Move to bundlr_dir
-
-    # Get filesize
-    fsize = os.path.getsize(f"{pwd}/{file}")
-    # Get the upload price
-    price_command = f"npx bundlr price {fsize} -h https://node1.bundlr.network -c solana"
-    upload_price = int(
-        subprocess.check_output(
-            price_command, shell=True
-        ).decode("utf-8").strip('\n').split().pop(-4)
-    )
-
-    os.chdir(pwd)  # Return to working dir
-    return upload_price
 
 
 # NOTE: simple progress bar
