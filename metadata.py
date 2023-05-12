@@ -5,22 +5,28 @@ from typing import Any
 
 import requests
 
+from bundlr import get_bundlr_dir, get_bundlr_price
+
 
 class MetadataService():
     """
     Update existing attribute data on an NFT.
 
     Args:
-        force: Flag to bypass confirmation prompts.
         token_address: The NFT token address.
+        auth_keypair: The wallet auth for the NFT.
+        force: Flag to bypass confirmation prompts.
     """
     def __init__(
             self,
+            token_address: str,
+            auth_keypair: str,
             force: bool,
-            token_address: str
     ) -> None:
-        self.force = force
         self.token = token_address
+        self.auth_keypair = auth_keypair
+        self.force = force
+        # Non-init attrs
         self.uri: str = None  # on_chain uri -> off_chain metadata
         self.metadata: dict[str, Any] = None  # off_chain metadata
         self.existing_attrs: list[dict[str, str | int | float]] = None
@@ -103,41 +109,39 @@ class MetadataService():
         self.metadata["attributes"] = self.updated_attrs
 
         # Write the updated metadata to file
-        with open("updated_metadata.json", 'w') as f:
+        filename = "updated_metadata.json"
+        with open(filename, 'w') as f:
             f.write(json.dumps(self.metadata))
-        # Confirm existance of metadata file
-        assert os.path.exists(f"updated_metadata.json")  # sanity check
 
-    def _update_off_chain_data(
-            self,
-            bundlr_dir: str,
-            auth_keypair: str
-    ) -> None:
+        # Confirm existance of metadata file and set filepath
+        assert os.path.exists(filename)
+        self.metadata_path = os.path.abspath(filename)
+
+    def _upload_off_chain_data(self) -> None:
         """
-        Push the updated metadata to arweave.
+        Upload the updated metadata to arweave.
 
-        NOTE: This requires a small amount of lamports to fund the upload to
-        arweave.
-
-        Args:
-            bundlr_dir: The directory where the bundlr program is installed.
-            auth_keypair: The path to the configured wallet authority.
+        NOTE: This requires a small amount of available lamports to fund the
+        upload to arweave.
         """
         try:
-            # Get pwd
+            # Get pwd and bundlr dir
             curdir = os.path.abspath('.')
-            # TODO navigate to bundlr dir
-            os.chdir(bundlr_dir)
-            # TODO Create json file
-            jsonified = json.dumps(self.metadata)
-            # TODO calculate price for upload
-            # TODO fund bundlr node
+            bundlr_dir = get_bundlr_dir()
+            print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
+            os.chdir(bundlr_dir)  # Nav to bundlr dir
+
+            # Fund bundlr_node
+            upload_price = get_bundlr_price(file=self.metadata_path)
+            print(f"upload_price: {upload_price}")
             # TODO upload to arweave
             # TODO check for successful upload
             # TODO preserve uri
-            uri = None
+            # uri = None
+
             # Return to previous location
             os.chdir(curdir)
+            # print(os.path.abspath('.'))  # NOTE: TESTING
         except FileNotFoundError as de:
             print(f"Error switching directories: {de}")
             raise de
