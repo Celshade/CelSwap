@@ -9,8 +9,9 @@ class TempCel():
     """
     Manage a temporary working environment so user dirs are not polluted.
 
-    This is a context manager. Any temporary files should be removed upon
-    exit.
+    This context manager will manage a temporary working environment and
+    ensure that any generated files will be cleaned up (removed) once the
+    program terminates.
 
     `i.e. with TempCel(): do stuff`
     """
@@ -163,6 +164,11 @@ def get_bundlr_price(file: str, bundlr_dir: str, bundlr_node: int = 1) -> int:
 
     os.chdir(pwd)  # Return to working dir
     return upload_price
+
+
+
+
+
 
 
 # NOTE: simple progress bar
