@@ -68,8 +68,10 @@ def fund_bundlr_node(lamports: int, wallet: str, bundlr_node: int = 1) -> None:
     fund_message = int(
         subprocess.check_output(
             command, shell=True
-        ).decode("utf-8").strip('\n').split().pop(-4)
+        ).decode("utf-8").strip('\n').split()
     )
+    # TODO confirm successful output message
+    # assert "<something>" in fund_message
 
 
 def upload_file_to_arweave(file: str, bundlr_node: int = 1) -> str:
