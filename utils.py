@@ -135,7 +135,7 @@ def get_bundlr_dir() -> str | None:
         raise e
 
 
-def get_bundlr_price(file: str, bundlr_dir: str) -> int:
+def get_bundlr_price(file: str, bundlr_dir: str, bundlr_node: int = 1) -> int:
     """
     Get the price [in lamports] to upload the given file to arweave.
 
@@ -143,14 +143,18 @@ def get_bundlr_price(file: str, bundlr_dir: str) -> int:
 
     Args:
         file: The file to price-check.
+        bundlr_dir: The directory for the bundlr installation.
+        bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
     """
     pwd = os.path.abspath('.')
     os.chdir(bundlr_dir)  # Move to bundlr_dir
 
     # Get filesize
     fsize = os.path.getsize(f"{pwd}/{file}")
+    # Config bundlr_network url
+    bundlr_node = f"https://node{bundlr_node}.bundlr.network"
     # Get the upload price
-    price_command = f"npx bundlr price {fsize} -h https://node1.bundlr.network -c solana"
+    price_command = f"npx bundlr price {fsize} -h {bundlr_node} -c solana"
     upload_price = int(
         subprocess.check_output(
             price_command, shell=True
