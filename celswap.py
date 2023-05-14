@@ -60,6 +60,7 @@ def main():
                 service._update_attrs(new_data=data, show=True)
                 service._upload_off_chain_data()
                 # Update the metadata URI
+                service.update_metadata()
 
             except Exception as e:
                 pass

@@ -1,5 +1,6 @@
 import os
 import json
+import subprocess
 from pprint import pprint
 from typing import Any
 
@@ -163,12 +164,25 @@ class MetadataService():
             print(f"Error updating off-chain metadata: {e}")
             raise e
 
-    def _update_metadata_uri(self):
-        # TODO metaboss
-        raise NotImplementedError
+    def update_metadata(self):
+        """
+        Update the on_chain metadata uri for the new metadata.
+        """
+        # metaboss update command
+        cmd = f"metaboss update uri --account {self.token} --new-uri {self.uri}"
 
-    # TODO
-    # Upload new off-chain metadata
+        try:
+            response = subprocess.check_output(
+                cmd,
+                shell=True,
+            ).decode("utf-8").strip('\n').split()
+
+            assert "Tx" and "sig" in response
+            return response[-2]
+
+        except Exception as e:
+            print(f"Error updating the on_chain UIR: {e}")
+            raise e
 
     def get_existing_data(self, show: bool = False) -> None:
         """
