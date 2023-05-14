@@ -177,7 +177,7 @@ class MetadataService():
                 shell=True,
             ).decode("utf-8").strip('\n').split()
 
-            assert "Tx" and "sig" in response
+            assert response[0] == "Tx" and response[1] == "sig:"
             return response[-2]
 
         except Exception as e:
