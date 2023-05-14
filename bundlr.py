@@ -35,43 +35,54 @@ def get_bundlr_price(file: str, bundlr_node: int = 1) -> int:
         file: The file to price-check.
         bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
     """
-    # Get filesize
-    fsize = os.path.getsize(file)
-    # Config bundlr_network url
-    node = f"https://node{bundlr_node}.bundlr.network"
-    # Get the upload price
-    command = f"npx bundlr price {fsize} -h {node} -c solana"
-    upload_price = int(
-        subprocess.check_output(
-            command, shell=True
-        ).decode("utf-8").strip('\n').split().pop(-4)
-    )
-    return upload_price
+    try:
+        # Get filesize
+        fsize = os.path.getsize(file)
+        # Config bundlr_network url
+        node = f"https://node{bundlr_node}.bundlr.network"
+        # Get the upload price
+        command = f"npx bundlr price {fsize} -h {node} -c solana"
+        upload_price = int(
+            subprocess.check_output(
+                command, shell=True
+            ).decode("utf-8").strip('\n').split().pop(-4)
+        )
+        return upload_price
+
+    except Exception as e:
+        print(f"Error getting bundlr price: {e}")
+        raise e
 
 
-def fund_bundlr_node(lamports: int, wallet: str, bundlr_node: int = 1) -> None:
+def fund_bundlr_node(lamports: int, wallet: str, bundlr_node: int = 1) -> str:
     """
-    Fund the bundlr node.
+    Fund the bundlr node and return the transactionID as confirmation.
 
-    NOTE: Funds will be taken from the current keypair designated in the solana
-    config.
+    NOTE: Funds will automatically be taken from the current keypair
+    designated in the solana config.
 
     Args:
         lamports: The number of lamports to fund the node with.
         wallet: The path to the funding wallet.
         bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
     """
-    # Config bundlr_network url
-    node = f"https://node{bundlr_node}.bundlr.network"
-    # Fund the node
-    command = f"npx bundlr fund {lamports} -h {node} -w {wallet} -c solana"
-    fund_message = int(
-        subprocess.check_output(
-            command, shell=True
+    try:
+        # Config bundlr_network url
+        node = f"https://node{bundlr_node}.bundlr.network"
+        # Fund the node
+        command = f"npx bundlr fund {lamports} -h {node} -w {wallet} -c solana"
+        fund_message = subprocess.check_output(
+            command,
+            shell=True,
+            input=b'Y'  # NOTE: `input` param will handle prompt responses :)
         ).decode("utf-8").strip('\n').split()
-    )
-    # TODO confirm successful output message
-    # assert "<something>" in fund_message
+        # Confirm successful transaction
+        assert "Transaction" in fund_message and "ID:" == fund_message[-2]
+        return fund_message[-1]
+
+    except AssertionError as ae:
+        print(f"Error funding bundlr node: {ae}")
+        raise ae
 
 
 def upload_file_to_arweave(file: str, bundlr_node: int = 1) -> str:

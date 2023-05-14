@@ -5,7 +5,7 @@ from typing import Any
 
 import requests
 
-from bundlr import get_bundlr_dir, get_bundlr_price
+from bundlr import get_bundlr_dir, get_bundlr_price, fund_bundlr_node
 
 
 class MetadataService():
@@ -134,9 +134,15 @@ class MetadataService():
             print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
             os.chdir(bundlr_dir)  # Nav to bundlr dir
 
-            # Fund bundlr_node
+            # Get bundlr price for upload
             upload_price = get_bundlr_price(file=self.metadata_path)
-            print(f"upload_price: {upload_price}")
+            print(f"upload_price: {upload_price}")  # NOTE: TESTING
+            # Fund the bundlr node
+            fund_txn_id = fund_bundlr_node(
+                lamports=upload_price,
+                wallet=self.auth_keypair
+            )
+            print(f"Bundlr node funded!\nID: {fund_txn_id}")  # NOTE: TESTING
             # TODO upload to arweave
             # TODO check for successful upload
             # TODO preserve uri
