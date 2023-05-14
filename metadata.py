@@ -5,7 +5,9 @@ from typing import Any
 
 import requests
 
-from bundlr import get_bundlr_dir, get_bundlr_price, fund_bundlr_node
+from bundlr import (
+    get_bundlr_dir, get_bundlr_price, fund_bundlr_node, upload_file_to_arweave
+)
 
 
 class MetadataService():
@@ -29,6 +31,7 @@ class MetadataService():
         # Non-init attrs
         self.uri: str = None  # on_chain uri -> off_chain metadata
         self.metadata: dict[str, Any] = None  # off_chain metadata
+        self.metadata_file: str = None  # The metadata json file
         self.existing_attrs: list[dict[str, str | int | float]] = None
         self.updated_attrs: list[dict[str, str | int | float]] = None
 
@@ -118,7 +121,7 @@ class MetadataService():
 
         # Confirm existance of metadata file and set filepath
         assert os.path.exists(filename)
-        self.metadata_path = os.path.abspath(filename)
+        self.metadata_file = os.path.abspath(filename)
 
     def _upload_off_chain_data(self) -> None:
         """
@@ -135,7 +138,7 @@ class MetadataService():
             os.chdir(bundlr_dir)  # Nav to bundlr dir
 
             # Get bundlr price for upload
-            upload_price = get_bundlr_price(file=self.metadata_path)
+            upload_price = get_bundlr_price(file=self.metadata_file)
             print(f"upload_price: {upload_price}")  # NOTE: TESTING
             # Fund the bundlr node
             fund_txn_id = fund_bundlr_node(
@@ -143,10 +146,12 @@ class MetadataService():
                 wallet=self.auth_keypair
             )
             print(f"Bundlr node funded!\nID: {fund_txn_id}")  # NOTE: TESTING
-            # TODO upload to arweave
-            # TODO check for successful upload
-            # TODO preserve uri
-            # uri = None
+            # Upload updated metadata to arweave and preserve the new URI
+            self.uri = upload_file_to_arweave(
+                file=self.metadata_file,
+                wallet=self.auth_keypair
+            )
+            print(f"File uploaded!\nURI: {self.uri}")  # NOTE: TESTING
 
             # Return to previous location
             os.chdir(curdir)
@@ -163,8 +168,7 @@ class MetadataService():
         raise NotImplementedError
 
     # TODO
-    # Update existing fields to the provided values
-    #   Upload new off-chain metadata
+    # Upload new off-chain metadata
 
     def get_existing_data(self, show: bool = False) -> None:
         """

@@ -71,26 +71,44 @@ def fund_bundlr_node(lamports: int, wallet: str, bundlr_node: int = 1) -> str:
         node = f"https://node{bundlr_node}.bundlr.network"
         # Fund the node
         command = f"npx bundlr fund {lamports} -h {node} -w {wallet} -c solana"
-        fund_message = subprocess.check_output(
+        fund_msg = subprocess.check_output(
             command,
             shell=True,
             input=b'Y'  # NOTE: `input` param will handle prompt responses :)
         ).decode("utf-8").strip('\n').split()
-        # Confirm successful transaction
-        assert "Transaction" in fund_message and "ID:" == fund_message[-2]
-        return fund_message[-1]
+
+        # Confirm successful fund transaction
+        assert "Transaction" in fund_msg and "ID:" == fund_msg[-2]
+        return fund_msg[-1]
 
     except AssertionError as ae:
-        print(f"Error funding bundlr node: {ae}")
+        print(f"Error funding bundlr node. Ensure you have enough funds.")
         raise ae
 
 
-def upload_file_to_arweave(file: str, bundlr_node: int = 1) -> str:
+def upload_file_to_arweave(file: str, wallet: str, bundlr_node: int = 1) -> str:
     """
     Upload the file to arweave and return the destination url.
 
     Args:
         file: The file to upload.
+        wallet: The path to the funding wallet.
         bundlr_node: The bundlr node to use (default=1).  NOTE: use default 95%
     """
-    raise NotImplementedError
+    try:
+        # Config bundlr_network url
+        node = f"https://node{bundlr_node}.bundlr.network"
+        # Upload the file
+        command = f"npx bundlr upload {file} -h {node} -w {wallet} -c solana"
+        upload_msg = subprocess.check_output(
+            command,
+            shell=True,
+        ).decode("utf-8").strip('\n').split()
+
+        # Confirm successful upload and return the url
+        assert "Uploaded" in upload_msg and upload_msg[-1].startswith("https")
+        return upload_msg[-1]
+
+    except AssertionError as ae:
+        print(f"Error uploading file to arweave: {ae}.")
+        raise ae

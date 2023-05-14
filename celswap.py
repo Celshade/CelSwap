@@ -56,11 +56,10 @@ def main():
 
                 # Get existing data
                 service.get_existing_data(show=True)
-                # Create updated data
+                # Create updated metadata
                 service._update_attrs(new_data=data, show=True)
                 service._upload_off_chain_data()
-                # service._create_new_off_chain_data()
-                # Upload new data
+                # Update the metadata URI
 
             except Exception as e:
                 pass
