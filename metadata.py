@@ -146,7 +146,7 @@ class MetadataService():
             # Get pwd and bundlr dir
             curdir = os.path.abspath('.')
             bundlr_dir = get_bundlr_dir()
-            print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
+            # print(f"\nbundlr_dir: {bundlr_dir}")  # NOTE: TESTING
             os.chdir(bundlr_dir)  # Nav to bundlr dir
 
             # Get bundlr price for upload
@@ -157,7 +157,7 @@ class MetadataService():
                 lamports=upload_price,
                 wallet=self.auth_keypair
             )
-            print(f"Bundlr node funded!\nID: {fund_txn_id}")  # NOTE: TESTING
+            print(f"Bundlr node funded!\nTx: {fund_txn_id}")  # NOTE: TESTING
             # Upload updated metadata to arweave and preserve the new URI
             self.uri = upload_file_to_arweave(
                 file=self.metadata_file,
@@ -217,6 +217,7 @@ class MetadataService():
                 # pprint(self.metadata)
                 print("Existing attributes:")
                 pprint(self.existing_attrs)
+                print()
         except Exception as e:
             print(f"Error loading existing data: {e}")
             raise e

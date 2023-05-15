@@ -31,16 +31,16 @@ def main():
     token: str = data.pop("token")
     force: bool = data.pop("force")
     print(f"Token: {token}")  # NOTE: TESTING
-    print(f"Attributes: {data}")  # NOTE: TESTING
+    # print(f"Attributes: {data}")  # NOTE: TESTING
     # print(type(data))  # NOTE: TESTING
-    print(f"Force flag: {force}")  # NOTE: TESTING
+    # print(f"Force flag: {force}")  # NOTE: TESTING
     # print(type(force))  # NOTE: TESTING
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     if token:
         # Init vars and service(s)
         wallet = get_wallet_path()
-        print(f"wallet: {wallet}\n")  # NOTE: TESTING
+        # print(f"wallet: {wallet}\n")  # NOTE: TESTING
         service = MetadataService(
             token_address=token,
             auth_keypair=wallet,
