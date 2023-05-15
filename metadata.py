@@ -96,33 +96,44 @@ class MetadataService():
             new_data: The desired attributes and their values.
             show: Flag to output testing info (default=False).
         """
-        # Preserve existing attributes in case not all are updated
-        self.updated_attrs = self.existing_attrs.copy()
+        try:
+            # Preserve existing attributes in case not all are updated
+            self.updated_attrs = self.existing_attrs.copy()
+            update_counter = 0  # Track how many attrs were updated
 
-        # Update attributes
-        for attr in self.updated_attrs:
-            trait = attr["trait_type"]
+            # Update attributes
+            for attr in self.updated_attrs:
+                trait, val = attr["trait_type"], attr["value"]
 
-            if attr["trait_type"] in new_data:
-                new_value = new_data[trait]
+                if trait in new_data and val != new_data[trait]:
+                    new_val = new_data[trait]
 
-                # Handle verbose
-                if show:
-                    print(f"Updated {trait}: {attr['value']} -> {new_value}")
-                # Update the attribute
-                attr["value"] = new_value
+                    # Handle verbose
+                    if show:
+                        print(f"Updated {trait}: {attr['value']} -> {new_val}")
+                    # Update the attribute
+                    attr["value"] = new_val
+                    update_counter += 1
 
-        # Update metadata
-        self.metadata["attributes"] = self.updated_attrs
+            # Exit early if nothing was updated
+            assert update_counter > 0
 
-        # Write the updated metadata to file
-        filename = "updated_metadata.json"
-        with open(filename, 'w') as f:
-            f.write(json.dumps(self.metadata))
+            # Update metadata
+            self.metadata["attributes"] = self.updated_attrs
 
-        # Confirm existance of metadata file and set filepath
-        assert os.path.exists(filename)
-        self.metadata_file = os.path.abspath(filename)
+            # Write the updated metadata to file
+            filename = "updated_metadata.json"
+            with open(filename, 'w') as f:
+                f.write(json.dumps(self.metadata))
+
+            # Confirm existance of metadata file and set filepath
+            if os.path.exists(filename):
+                self.metadata_file = os.path.abspath(filename)
+            else:
+                raise FileNotFoundError("updated_metadata.json not found")
+        except AssertionError as ae:
+            print("No new attributes found! Check your input!")
+            raise ae
 
     def _upload_off_chain_data(self) -> None:
         """
@@ -178,7 +189,12 @@ class MetadataService():
             ).decode("utf-8").strip('\n').split()
 
             assert response[0] == "Tx" and response[1] == "sig:"
+            print(f"CelSwap complete! Metadata has been updated!")
             return response[-2]
+
+        except AssertionError:
+            if response[0] == "URI" and "same" in response:
+                raise AssertionError("No new URI to update.")
 
         except Exception as e:
             print(f"Error updating the on_chain UIR: {e}")
