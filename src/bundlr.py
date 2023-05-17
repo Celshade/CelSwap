@@ -13,7 +13,7 @@ def get_bundlr_dir() -> str | None:
     `See project README for config file information`
     """
     try:
-        with open("../../config.json", 'r') as f:
+        with open("../config.json", 'r') as f:
             bundlr_dir = json.load(f).get("bundlr_dir")
             if bundlr_dir:
                 return bundlr_dir
