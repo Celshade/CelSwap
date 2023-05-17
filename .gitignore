@@ -8,3 +8,4 @@ venv/*
 
 # tests
 tests.txt
+test_upload.txt
