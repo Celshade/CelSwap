@@ -17,7 +17,7 @@ _Windows OS functionality has not yet been tested_
     * See docs and install instructions -> [here](https://www.python.org/)
 1. **Solana CLI**:
     * See docs and install instructions -> [here](https://docs.solana.com/cli/install-solana-cli-tools)
-1. **Bundlr CLI**:
+1. **Bundlr CLI**: (make note of the installation dir)
     * See docs and install instructions -> [here](https://docs.bundlr.network/developer-docs/sdk/installing-the-sdk)
 1. **Metaboss**:
     * See docs and install instructions -> [here](https://metaboss.rs/installation.html)
