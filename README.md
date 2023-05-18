@@ -31,8 +31,8 @@ _Windows OS functionality has not yet been tested_
 
 ## Program Configuration
 Once the above requirements are installed, you'll need to update the \
-`config.json`in the CelSwap root directory with correct directory that \
-contains your `bundlr` installation.
+`config.json` file (found in the CelSwap root directory) with the correct \
+directory that contains your `bundlr` installation.
 
 i.e.
 
