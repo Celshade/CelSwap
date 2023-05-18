@@ -1,5 +1,5 @@
 # CelSwap
-[![GNU LGPLv3 license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://github.com/Celshade/CelSwap/blob/master/LICENSE.LESSER)
+[![GNU LGPLv3 license](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://github.com/Celshade/CelSwap/blob/master/LICENSE.LESSER)
 [![built with Python3](https://img.shields.io/badge/built%20with-Python3-green.svg)](https://www.python.org/)
 
 _A simple way to update SPL-token metadata_
