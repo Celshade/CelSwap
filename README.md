@@ -30,12 +30,13 @@ _Windows OS functionality has not yet been tested_
 ***
 
 ## Program Configuration
-Once the above requirements are installed, you'll need to update the
-`config.json`in the CelSwap root directory with correct directory that
+Once the above requirements are installed, you'll need to update the \
+`config.json`in the CelSwap root directory with correct directory that \
 contains your `bundlr` installation.
 
 i.e.
-Your config.json file should look like this:
+
+Your config.json file should look something like this:
 
 ```
 {
@@ -43,26 +44,31 @@ Your config.json file should look like this:
 }
 ```
 
-**SOLANA CONFIGRATION NEEDS TO HAVE THE PROPER URL AND KEYPAIR SET**
-This program assumes you already have the wallet authority set in your solana \
-config for any tokens you plan on updating. Naturally, your RPC url should also \
-be set appropriately. See the solana CLI docs for more information, but here \
-are the basic commands to work with.
+**DON'T FORGET YOUR SOLANA CONFIGRATION**
 
-`solana config get` (shows current solana config)
-`solana config set --url` (sets RPC url)
+This program assumes you already have the wallet authority set in your solana \
+config for any tokens that you plan on updating. Naturally, your RPC url should \
+also be set appropriately to match where your token lives (mainnet | devnet). \
+See the solana CLI docs for more information, but here are the basic commands \
+to work with:
+
+`solana config get` (shows current solana config) \
+`solana config set --url` (sets RPC url) \
 `solana config set --keypair` (sets wallet auth - use the ABSOLUTE path, not relative)
 ***
 
 ## Running CelSwap
-All you need is the **token_address** for the SPL-token's [off-chain] \
-metadata that you wish to update and a json string!
+All you need is the **token_address** for the SPL-token you wish to update \
+and the desired attributes/values.
+
+**CelSwap will NOT update attributes that do not already exist on the token** \
+(Planned to be included in a future release)
 
 To call the program, simply navigate to the CelSwap root directory, and call \
-the programand with a json string of `token:address, attribute:value` \
-key-value pairs in the following format.
+the program with a json string of `{token:address, attribute1:value, attribute2:value, ...}` \
 
 i.e.
+
 `python src/celswap.py -d '{"token": "iu7DGFv6LsdGb9THFGtdF3cSmpt8CwJjY527vnLzBcw", "base": "green", "glow": "magenta"}'`
 
 The `-d` flag stands for the `DATA` being passed to the program. \
