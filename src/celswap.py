@@ -24,17 +24,19 @@ def main():
     # Parse CLI for NFT data
     data = parse_cli_args()
     if not data:
-        print("No data provided. Run with --help for more info.")
+        print("No args provided. Run with --help for more info.")
         return
 
     # Get the token addr and `force` flag
     token: str = data.pop("token")
     force: bool = data.pop("force")
+    image: str = data.pop("image")
     print(f"Token: {token}")  # NOTE: TESTING
     # print(f"Attributes: {data}")  # NOTE: TESTING
     # print(type(data))  # NOTE: TESTING
     # print(f"Force flag: {force}")  # NOTE: TESTING
     # print(type(force))  # NOTE: TESTING
+    print(image)  # NOTE: TESTING
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     if token:
