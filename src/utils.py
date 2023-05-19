@@ -5,7 +5,6 @@ import argparse
 import subprocess
 
 
-# FIXME: Fix this context manager and ensure cleanup
 class TempCel():
     """
     Manage a temporary working environment so user dirs are not polluted.
@@ -62,7 +61,11 @@ def parse_cli_args() -> dict[str, str | int | float] | None:
         # Configure args: add as needed
         parser.add_argument(  # token data (JSON)
             "-d", "--data", type=str,
-            help="Token address and desired attribute data in JSON format"
+            help="'{\"token\":\"token_addr\", \"attr_name\":\"attr_val\",...}'"
+        )
+        parser.add_argument(  # image udates
+            "-i", "--image", type=str,
+            help="<image filename> (should be in ./images/)"
         )
         parser.add_argument(  # bool flag to control program prompts
             "-s", "--safe", action="store_true", default=True,
