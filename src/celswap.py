@@ -43,6 +43,7 @@ def main():
         # Init vars and service(s)
         wallet = get_wallet_path()
         # print(f"wallet: {wallet}\n")  # NOTE: TESTING
+        # if image:  # TODO implement image handling
         service = MetadataService(
             token_address=token,
             auth_keypair=wallet,
