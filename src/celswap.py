@@ -17,7 +17,7 @@ System Requirements:
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import TempCel, parse_cli_args, get_wallet_path
+from utils import TempCel, parse_cli_args, get_wallet_path, progressbar
 
 
 def main():
@@ -28,9 +28,9 @@ def main():
         return
 
     # Get the token addr and `force` flag
-    token: str = data.pop("token")
-    force: bool = data.pop("force")
-    image: str = data.pop("image")
+    token: str = data.pop("token", None)
+    force: bool = data.pop("force", None)
+    image: str = data.pop("image", None)
     print(f"Token: {token}")  # NOTE: TESTING
     # print(f"Attributes: {data}")  # NOTE: TESTING
     # print(type(data))  # NOTE: TESTING
