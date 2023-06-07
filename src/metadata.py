@@ -24,10 +24,12 @@ class MetadataService():
             self,
             token_address: str,
             auth_keypair: str,
-            force: bool,
+            image: str,
+            force: bool
     ) -> None:
         self.token = token_address
         self.auth_keypair = auth_keypair
+        self.image = image
         self.force = force
         # Non-init attrs
         self.uri: str = None  # on_chain uri -> off_chain metadata

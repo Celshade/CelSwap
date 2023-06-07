@@ -46,6 +46,7 @@ def main():
         service = MetadataService(
             token_address=token,
             auth_keypair=wallet,
+            image=image,
             force=force
         )
 
