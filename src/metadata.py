@@ -29,6 +29,7 @@ class MetadataService():
     ) -> None:
         self.token = token_address
         self.auth_keypair = auth_keypair
+        self.image = image
         self.force = force
         self.image = image
         # Non-init attrs
