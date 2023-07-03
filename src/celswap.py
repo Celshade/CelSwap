@@ -27,7 +27,7 @@ def main():
         print("No args provided. Run with --help for more info.")
         return
 
-    # Get the token addr and `force` flag
+    # Get params from CLI
     token: str = data.pop("token", None)
     force: bool = data.pop("force", None)
     image: str = data.pop("image", None)
@@ -36,18 +36,18 @@ def main():
     # print(type(data))  # NOTE: TESTING
     # print(f"Force flag: {force}")  # NOTE: TESTING
     # print(type(force))  # NOTE: TESTING
-    print(image)  # NOTE: TESTING
+    # print(image)  # NOTE: TESTING
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
     if token:
         # Init vars and service(s)
         wallet = get_wallet_path()
         # print(f"wallet: {wallet}\n")  # NOTE: TESTING
-        # if image:  # TODO implement image handling
         service = MetadataService(
             token_address=token,
             auth_keypair=wallet,
-            force=force
+            force=force,
+            image=image
         )
 
         with TempCel():  # Manage a working dir to avoid user file pollution
