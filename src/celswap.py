@@ -17,37 +17,42 @@ System Requirements:
 from pprint import pprint
 
 from metadata import MetadataService
-from utils import TempCel, parse_cli_args, get_wallet_path, progressbar
+from utils import TempCel, parse_cli_args, get_wallet_path
 
 
 def main():
     # Parse CLI for NFT data
-    data = parse_cli_args()
-    if not data:
-        print("No args provided. Run with --help for more info.")
-        return
+    # data = parse_cli_args()
+    # if not data:
+    #     print("No args provided. Run with --help for more info.")
+    #     return
 
-    # Get params from CLI
-    token: str = data.pop("token", None)
-    force: bool = data.pop("force", None)
-    image: str = data.pop("image", None)
-    print(f"Token: {token}")  # NOTE: TESTING
-    # print(f"Attributes: {data}")  # NOTE: TESTING
-    # print(type(data))  # NOTE: TESTING
-    # print(f"Force flag: {force}")  # NOTE: TESTING
-    # print(type(force))  # NOTE: TESTING
-    # print(image)  # NOTE: TESTING
+    # # Get params from CLI
+    # token: str = data.pop("token", None)
+    # force: bool = data.pop("force", None)
+    # image: str = data.pop("image", None)
+    # print(f"Token: {token}")  # NOTE: TESTING
+    # # print(f"Attributes: {data}")  # NOTE: TESTING
+    # # print(type(data))  # NOTE: TESTING
+    # # print(f"Force flag: {force}")  # NOTE: TESTING
+    # # print(type(force))  # NOTE: TESTING
+    # # print(image)  # NOTE: TESTING
+
+
+    import json
+    with open("clown_hash.json", 'r') as f:
+        tokens = json.loads(f.read())
 
     # print(os.path.abspath('.'))  # NOTE: TESTING
-    if token:
+    for token in tokens:
         # Init vars and service(s)
         wallet = get_wallet_path()
         # print(f"wallet: {wallet}\n")  # NOTE: TESTING
         service = MetadataService(
             token_address=token,
             auth_keypair=wallet,
-            force=force,
-            image=image
+            force=None,
+            image=None
         )
 
         with TempCel():  # Manage a working dir to avoid user file pollution
@@ -60,13 +65,14 @@ def main():
                 # Get existing data
                 service.get_existing_data(show=True)
                 # Create updated metadata
-                service._update_attrs(new_data=data, show=True)
+                # service._update_attrs(new_data=data, show=True)
+                name_updated = service._fix_cc_name_and_desc()
                 service._upload_off_chain_data()
-                # Update the metadata URI
-                service.update_metadata()
-
+                # Update the metadata URI [and name]
+                service.update_metadata(token=token, name_updated=name_updated)
             except Exception as e:
-                pass
+                print(f"Last update attempt on token: {token} | POS {tokens.index(token)}")
+                raise e
         # print("left context_manager")  # NOTE: TESTING
         # print(os.path.abspath('.'))  # NOTE: TESTING
 

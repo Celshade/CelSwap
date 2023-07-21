@@ -138,6 +138,35 @@ class MetadataService():
             print("No new attributes found! Check your input!")
             raise ae
 
+    def _fix_cc_name_and_desc(self) -> None:
+        # Fix description
+        # print(f"Existing desc: {self.metadata['description']}")
+        self.metadata["description"] = "A clown has many faces..."
+        # print(f"New desc: {self.metadata['description']}")
+
+        # Fix name (number)
+        name = self.metadata["name"]
+        number = int(name[name.find('#'):].strip('#'))
+        name_updated = False
+
+        if number < 100:
+            print(f"Name needs update: {name}")
+            self.metadata["name"] = f"Face Paint #{number}"
+            print(f"New name: {self.metadata['name']}")
+            name_updated = True
+
+        # Write the updated metadata to file
+        filename = "updated_metadata.json"
+        with open(filename, 'w') as f:
+            f.write(json.dumps(self.metadata))
+
+        # Confirm existance of metadata file and set filepath
+        if os.path.exists(filename):
+            self.metadata_file = os.path.abspath(filename)
+        else:
+            raise FileNotFoundError("updated_metadata.json not found")
+        return name_updated
+
     def _upload_off_chain_data(self) -> None:
         """
         Upload the updated metadata to arweave.
@@ -178,13 +207,17 @@ class MetadataService():
             print(f"Error updating off-chain metadata: {e}")
             raise e
 
-    def update_metadata(self):
+    def update_metadata(self, token: str, name_updated: bool):
         """
         Update the on_chain metadata uri for the new metadata.
         """
-        # metaboss update command
+        # metaboss update URI command
         cmd = f"metaboss update uri --account {self.token} --new-uri {self.uri}"
 
+        # metaboss update name command
+        cmd2 = f"metaboss update name --account {self.token} --new-name '{self.metadata['name']}'"
+
+        # Handle Metadata updates
         try:
             response = subprocess.check_output(
                 cmd,
@@ -192,12 +225,26 @@ class MetadataService():
             ).decode("utf-8").strip('\n').split()
 
             assert response[0] == "Tx" and response[1] == "sig:"
-            print(f"CelSwap complete! Metadata has been updated!")
-            return response[-2]
+            print(f"CelSwap complete! Metadata has been updated for {token}!")
+            # return response[-2]
 
         except AssertionError:
             if response[0] == "URI" and "same" in response:
                 raise AssertionError("No new URI to update.")
+
+        # Handle name updates
+        try:
+            if name_updated:
+                response = subprocess.check_output(
+                    cmd2,
+                    shell=True,
+                ).decode("utf-8").strip('\n').split()
+
+                assert response[0] == "Done!"
+                print(f"CelSwap complete! Name has been updated for {token}!")
+                # return response[-2]
+        except AssertionError:
+            raise e
 
         except Exception as e:
             print(f"Error updating the on_chain UIR: {e}")
@@ -218,8 +265,8 @@ class MetadataService():
             # Handle verbose
             if show:
                 # pprint(self.metadata)
-                print("Existing attributes:")
-                pprint(self.existing_attrs)
+                # print("Existing attributes:")
+                # pprint(self.existing_attrs)
                 print()
         except Exception as e:
             print(f"Error loading existing data: {e}")

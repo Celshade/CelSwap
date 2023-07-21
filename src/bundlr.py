@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 
-def get_bundlr_dir() -> str | None:
+def get_bundlr_dir() -> str:
     """
     Return the directory for bundlr calls.
 
